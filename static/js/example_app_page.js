@@ -20,6 +20,64 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     */
 
+    document.getElementById("budgetForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+    
+        // Get inputs
+        const income = parseFloat(document.getElementById("monthlyIncome").value);
+        const expenses = {
+            "Rent/Mortgage": parseFloat(document.getElementById("rentMortgage").value) || 0,
+            "Car Insurance": parseFloat(document.getElementById("carInsurance").value) || 0,
+            "Groceries": parseFloat(document.getElementById("groceries").value) || 0,
+            "Eating Out": parseFloat(document.getElementById("eatingOut").value) || 0,
+            "Transportation": parseFloat(document.getElementById("transportation").value) || 0,
+            "Entertainment": parseFloat(document.getElementById("entertainment").value) || 0,
+            "Savings": parseFloat(document.getElementById("savings").value) || 0,
+            "Phone Bill": parseFloat(document.getElementById("phoneBill").value) || 0,
+            "Electricity": parseFloat(document.getElementById("electricity").value) || 0,
+            "WiFi": parseFloat(document.getElementById("wifi").value) || 0,
+            "Miscellaneous": parseFloat(document.getElementById("miscellaneous").value) || 0,
+        };
+    
+        // Thresholds for budget categories
+        const thresholds = {
+            "Rent/Mortgage": 0.30,
+            "Car Insurance": 0.10,
+            "Groceries": 0.15,
+            "Eating Out": 0.10,
+            "Transportation": 0.10,
+            "Entertainment": 0.10,
+            "Savings": 0.20,
+            "Phone Bill": 0.05,
+            "Electricity": 0.10,
+            "WiFi": 0.05,
+            "Miscellaneous": 0.05,
+        };
+    
+        // Analyze the budget
+        const results = [];
+        for (const [category, amount] of Object.entries(expenses)) {
+            const threshold = thresholds[category];
+            const ratio = amount / income;
+            const flag = ratio > threshold;
+            results.push({ category, amount, threshold, ratio, flag });
+        }
+    
+        // Display results
+        const resultsDiv = document.getElementById("results");
+        resultsDiv.innerHTML = `<h3>Budget Analysis Results</h3>`;
+        results.forEach(({ category, amount, threshold, ratio, flag }) => {
+            const statusClass = flag ? "over-budget" : "within-budget";
+            const statusText = flag ? "Over Budget" : "Within Budget";
+            resultsDiv.innerHTML += `
+                <div>
+                    <strong>${category}:</strong> $${amount.toFixed(2)} 
+                    (${(ratio * 100).toFixed(2)}% of income, threshold: ${(threshold * 100).toFixed(2)}%) 
+                    - <span class="${statusClass}">${statusText}</span>
+                </div>`;
+        });
+    });
+
     // Listen for the form submission
     document.getElementById('addUserForm').addEventListener('submit', function(event) {
         // Prevent the default form submission behavior
