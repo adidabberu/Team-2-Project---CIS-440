@@ -313,13 +313,99 @@ document.addEventListener('DOMContentLoaded', function() {
 
 });
 
-function sendChat(text) {
-    if (text.trim() === "") {
-        console.error("Cannot send an empty message.");
-        return;
+// Toggle Chat Modal
+const chatHead = document.getElementById('chatHead');
+const chatModal = document.getElementById('chatModal');
+chatHead.addEventListener('click', () => {
+    chatModal.style.display = chatModal.style.display === 'flex' ? 'none' : 'flex';
+});
+
+// Chat Functionality
+const chatBody = document.getElementById('chatBody');
+const chatInput = document.getElementById('chatInput');
+const sendChat = document.getElementById('sendChat');
+
+async function sendMessageToAI(message) {
+    const maxRetries = 5;
+    const initialDelay = 1000; // 1 second
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            const response = await fetch('https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Uncomment the Authorization header if you have an API key
+                    // 'Authorization': 'Bearer YOUR_HUGGING_FACE_API_KEY'
+                },
+                body: JSON.stringify({
+                    inputs: message, // Message content
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+
+            if (!data || !data.generated_text) {
+                throw new Error('No response returned from API');
+            }
+
+            return data.generated_text; // AI-generated response
+
+        } catch (error) {
+            if (error.message.includes('429') || error.message.includes('503')) {
+                if (attempt < maxRetries) {
+                    const delay = initialDelay * (2 ** (attempt - 1)); // Exponential backoff
+                    console.log(`Attempt ${attempt} failed. Retrying in ${delay} ms...`);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    continue;
+                } else {
+                    console.error('Max retries reached. Unable to get a response from the API.');
+                }
+            } else {
+                console.error('Error communicating with AI:', error.message);
+            }
+            return 'Sorry, there was an error processing your request. Please try again.';
+        }
     }
-    ChatSocket.sendMessage(text);
 }
+
+sendChat.addEventListener('click', async () => {
+    const userMessage = chatInput.value.trim();
+    if (userMessage === '') return;
+
+    // Display user's message
+    const userBubble = document.createElement('div');
+    userBubble.textContent = userMessage;
+    userBubble.style.textAlign = 'right';
+    chatBody.appendChild(userBubble);
+
+    // Clear input
+    chatInput.value = '';
+
+    // Get AI response
+    const aiResponse = await sendMessageToAI(userMessage);
+
+    // Display AI's response
+    const aiBubble = document.createElement('div');
+    aiBubble.textContent = aiResponse;
+    aiBubble.style.textAlign = 'left';
+    chatBody.appendChild(aiBubble);
+
+    // Scroll to the bottom
+    chatBody.scrollTop = chatBody.scrollHeight;
+});
+
+// function sendChat(text) {
+//     if (text.trim() === "") {
+//         console.error("Cannot send an empty message.");
+//         return;
+//     }
+//     ChatSocket.sendMessage(text);
+// }
 
 async function addUser(email, password, description, isAdmin) {
     if (!email || !password || !description) {
