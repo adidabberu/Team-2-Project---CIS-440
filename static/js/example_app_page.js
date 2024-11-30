@@ -71,7 +71,92 @@ document.addEventListener('DOMContentLoaded', function() {
             const budgetModal = bootstrap.Modal.getInstance(document.getElementById('budgetModal'));
             budgetModal.hide();
         });
+        
     }
+
+        // Journal Entry Logic
+
+    const journalForm = document.getElementById('journalForm');
+    const journalEntryField = document.getElementById('journalEntry');
+    const journalNameField = document.getElementById('journalName'); // New input for entry name
+
+    // Save the journal entry
+    journalForm.addEventListener('submit', (event) => {
+        event.preventDefault(); // Prevent default form submission
+
+        const entryText = journalEntryField.value.trim(); // Get the input value
+        const entryName = journalNameField.value.trim(); // Get the entry name
+
+        if (entryText === "" || entryName === "") {
+            alert("Both journal name and entry cannot be empty.");
+            return;
+        }
+
+        // Retrieve existing entries from localStorage or initialize a new array
+        const savedEntries = JSON.parse(localStorage.getItem('journalEntries')) || [];
+
+        // Add the new entry with a name and timestamp
+        savedEntries.push({
+            name: entryName,
+            text: entryText,
+            timestamp: new Date().toISOString(),
+        });
+
+        // Update localStorage
+        localStorage.setItem('journalEntries', JSON.stringify(savedEntries));
+
+        // Clear the form fields
+        journalEntryField.value = "";
+        journalNameField.value = "";
+
+        // Close the modal
+        const journalModal = bootstrap.Modal.getInstance(document.getElementById('journalModal'));
+        journalModal.hide();
+
+        alert("Journal entry saved successfully!");
+
+        // Update the journal list on the dashboard
+        updateJournalEntriesList();
+    });
+
+    // Function to update the journal entries list on the dashboard
+    function updateJournalEntriesList() {
+        const entriesContainer = document.getElementById('journalEntriesList');
+        const savedEntries = JSON.parse(localStorage.getItem('journalEntries')) || [];
+
+        // Clear existing entries
+        entriesContainer.innerHTML = '';
+
+        // Display saved entries
+        savedEntries.forEach((entry, index) => {
+            const entryDiv = document.createElement('div');
+            entryDiv.classList.add('journal-entry');
+
+            const entryName = document.createElement('strong');
+            entryName.textContent = entry.name;
+
+            const entryTimestamp = document.createElement('small');
+            entryTimestamp.textContent = new Date(entry.timestamp).toLocaleString();
+
+            const entryText = document.createElement('p');
+            entryText.textContent = entry.text;
+
+            const openEntryButton = document.createElement('button');
+            openEntryButton.classList.add('btn', 'btn-link');
+            openEntryButton.textContent = 'View Entry';
+            openEntryButton.addEventListener('click', () => alert(entry.text));
+
+            entryDiv.appendChild(entryName);
+            entryDiv.appendChild(entryTimestamp);
+            entryDiv.appendChild(entryText);
+            entryDiv.appendChild(openEntryButton);
+
+            entriesContainer.appendChild(entryDiv);
+        });
+    }
+
+    // Load saved journal entries into the dashboard when page loads
+    updateJournalEntriesList();
 
     const addUserForm = document.getElementById('addUserForm');
     if (addUserForm) {
@@ -182,6 +267,45 @@ document.addEventListener('DOMContentLoaded', function() {
             accountManagementTab.setAttribute('disabled', 'true');
         }
     }
+
+    // Add this within the DOMContentLoaded or equivalent initialization section
+    document.addEventListener('DOMContentLoaded', () => {
+    const journalForm = document.getElementById('journalForm');
+    const journalEntryField = document.getElementById('journalEntry');
+
+    // Save the journal entry
+    journalForm.addEventListener('submit', (event) => {
+        event.preventDefault(); // Prevent default form submission
+
+        const entryText = journalEntryField.value.trim(); // Get the input value
+        if (entryText === "") {
+            alert("Journal entry cannot be empty.");
+            return;
+        }
+
+        // Retrieve existing entries from localStorage or initialize a new array
+        const savedEntries = JSON.parse(localStorage.getItem('journalEntries')) || [];
+
+        // Add the new entry with a timestamp
+        savedEntries.push({
+            text: entryText,
+            timestamp: new Date().toISOString(),
+        });
+
+        // Update localStorage
+        localStorage.setItem('journalEntries', JSON.stringify(savedEntries));
+
+        // Clear the textarea
+        journalEntryField.value = "";
+
+        // Close the modal
+        const journalModal = bootstrap.Modal.getInstance(document.getElementById('journalModal'));
+        journalModal.hide();
+
+        alert("Journal entry saved successfully!");
+    });
+});
+
     // Initialize budget selector change event
     
     
