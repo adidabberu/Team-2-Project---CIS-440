@@ -5,11 +5,17 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token
 from extensions import db  # Import db from the newly created extensions.py file
 from model import User  # Import the User model
-
-from flask import Blueprint, request, jsonify
+from transformers import AutoModelForCausalLM, AutoTokenizer
+import torch
 import pandas as pd
 
 routes_blueprint = Blueprint('routes', __name__)
+
+# Load the model and tokenizer globally for efficiency
+MODEL_NAME = "microsoft/DialoGPT-medium"
+tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+model = AutoModelForCausalLM.from_pretrained(MODEL_NAME)
+
 
 THRESHOLDS = {
     'Rent/Mortgage': 0.30,
@@ -241,3 +247,45 @@ def get_all_users():
     users_data = [{"id": user.id, "email": user.email, "description": user.description, "admin": user.admin} for user in users]  # Format the user data
 
     return jsonify(users_data), 200  # Return the list of all users
+
+@routes_blueprint.route('/chat', methods=['POST'])
+def chat():
+    """
+    Handle chat requests by generating AI responses using DialoGPT.
+    """
+    try:
+        # Extract the user's message from the JSON payload
+        data = request.json
+        user_message = data.get('message', '')
+
+        if not user_message:
+            return jsonify({"error": "Message content is required"}), 400
+
+        # Tokenize the user input
+        input_ids = tokenizer.encode(user_message, return_tensors='pt')
+
+        # Create an attention mask (1 for actual tokens, 0 for padding tokens)
+        attention_mask = torch.ones(input_ids.shape, dtype=torch.long)
+
+        # Generate a response
+        response_ids = model.generate(
+            input_ids,
+            max_length=200,
+            num_return_sequences=1,
+            no_repeat_ngram_size=5,
+            early_stopping=True,
+            do_sample=True,
+            top_k=100,
+            top_p=0.98,
+            temperature=1.2,
+            pad_token_id=tokenizer.eos_token_id,
+            attention_mask=attention_mask  # Pass attention mask here
+        )
+        
+        # Decode the response
+        response_text = tokenizer.decode(response_ids[0], skip_special_tokens=True)
+
+        return jsonify({"response": response_text}), 200
+
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500

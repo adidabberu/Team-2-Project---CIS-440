@@ -313,92 +313,102 @@ document.addEventListener('DOMContentLoaded', function() {
 
 });
 
-// Toggle Chat Modal
+// Get elements
 const chatHead = document.getElementById('chatHead');
 const chatModal = document.getElementById('chatModal');
+const chatBody = document.getElementById('chatBody');
+const chatInput = document.getElementById('chatInput');
+const sendChat = document.getElementById('sendChat');
+
+// Initially hide the chat modal
+chatModal.style.display = 'none';  // Set the chat modal to be hidden by default
+
+// Toggle Chat Modal when the chat icon (chatHead) is clicked
 chatHead.addEventListener('click', () => {
     chatModal.style.display = chatModal.style.display === 'flex' ? 'none' : 'flex';
 });
 
 // Chat Functionality
-const chatBody = document.getElementById('chatBody');
-const chatInput = document.getElementById('chatInput');
-const sendChat = document.getElementById('sendChat');
-
 async function sendMessageToAI(message) {
-    const maxRetries = 5;
-    const initialDelay = 1000; // 1 second
+    try {
+        const response = await fetch('http://127.0.0.1:5000/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message }),
+        });
 
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        try {
-            const response = await fetch('https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    // Uncomment the Authorization header if you have an API key
-                    // 'Authorization': 'Bearer YOUR_HUGGING_FACE_API_KEY'
-                },
-                body: JSON.stringify({
-                    inputs: message, // Message content
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`API error: ${response.status} ${response.statusText}`);
-            }
-
-            const data = await response.json();
-
-            if (!data || !data.generated_text) {
-                throw new Error('No response returned from API');
-            }
-
-            return data.generated_text; // AI-generated response
-
-        } catch (error) {
-            if (error.message.includes('429') || error.message.includes('503')) {
-                if (attempt < maxRetries) {
-                    const delay = initialDelay * (2 ** (attempt - 1)); // Exponential backoff
-                    console.log(`Attempt ${attempt} failed. Retrying in ${delay} ms...`);
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                    continue;
-                } else {
-                    console.error('Max retries reached. Unable to get a response from the API.');
-                }
-            } else {
-                console.error('Error communicating with AI:', error.message);
-            }
-            return 'Sorry, there was an error processing your request. Please try again.';
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
         }
+
+        const data = await response.json();
+
+        if (!data.response) {
+            throw new Error('No response from AI');
+        }
+
+        return data.response; // AI-generated response
+    } catch (error) {
+        console.error('Error:', error.message);
+        return 'Sorry, there was an error processing your request.';
     }
 }
 
+// Function to create and append chat bubbles
+function createChatBubble(message, sender) {
+    const bubble = document.createElement('div');
+    bubble.classList.add('chat-bubble', sender);  // Add 'user' or 'ai' class for styling
+    bubble.textContent = message;
+    chatBody.appendChild(bubble);  // Append the message bubble to the chat body
+}
+
+// Event listener for "Send" button click
 sendChat.addEventListener('click', async () => {
     const userMessage = chatInput.value.trim();
     if (userMessage === '') return;
 
-    // Display user's message
-    const userBubble = document.createElement('div');
-    userBubble.textContent = userMessage;
-    userBubble.style.textAlign = 'right';
-    chatBody.appendChild(userBubble);
+    // Display user's message in a bubble
+    createChatBubble(userMessage, 'user');
 
-    // Clear input
+    // Clear input field
     chatInput.value = '';
 
     // Get AI response
     const aiResponse = await sendMessageToAI(userMessage);
 
-    // Display AI's response
-    const aiBubble = document.createElement('div');
-    aiBubble.textContent = aiResponse;
-    aiBubble.style.textAlign = 'left';
-    chatBody.appendChild(aiBubble);
+    // Display AI's response in a bubble
+    createChatBubble(aiResponse, 'ai');
 
-    // Scroll to the bottom
+    // Scroll to the bottom of the chat
     chatBody.scrollTop = chatBody.scrollHeight;
 });
 
+// Event listener for "Enter" key press to send message
+chatInput.addEventListener('keypress', async (event) => {
+    if (event.key === 'Enter') {
+        event.preventDefault(); // Prevent form submission on Enter key
+
+        const userMessage = chatInput.value.trim();
+        if (userMessage === '') return;
+
+        // Display user's message in a bubble
+        createChatBubble(userMessage, 'user');
+
+        // Clear input field
+        chatInput.value = '';
+
+        // Get AI response
+        const aiResponse = await sendMessageToAI(userMessage);
+
+        // Display AI's response in a bubble
+        createChatBubble(aiResponse, 'ai');
+
+        // Scroll to the bottom of the chat
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+});
 // function sendChat(text) {
 //     if (text.trim() === "") {
 //         console.error("Cannot send an empty message.");

@@ -4,7 +4,7 @@ from extensions import db, jwt, cors
 from gevent import monkey
 
 # Patch for gevent compatibility
-monkey.patch_all()
+# monkey.patch_all()
 
 # Try to import the Config class from config.py (if it exists)
 try:

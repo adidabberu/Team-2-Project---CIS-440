@@ -13,3 +13,5 @@ flask-cors
 gunicorn==20.0.4
 gevent
 pandas
+transformers
+torch
