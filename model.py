@@ -1,6 +1,5 @@
 from extensions import db  # Import db from extensions.py
 
-# User table
 class User(db.Model):
     __tablename__ = 'user'  # Specifies the table name
 
@@ -14,6 +13,28 @@ class User(db.Model):
     # String representation of the User object for debugging
     def __repr__(self):
         return f'<User {self.email}>'
+# User table
+class UserBudget(db.Model):
+    __tablename__ = 'user_budget'
+    __table_args__ = {'extend_existing': True}  # Allow redefinition
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String, nullable=False)  # Adjusted to match `user_id` from payload
+    month = db.Column(db.String(7), nullable=False)
+    monthly_income = db.Column(db.Float, nullable=False)
+    rent_mortgage = db.Column(db.Float, nullable=False, default=0)
+    car_insurance = db.Column(db.Float, nullable=False, default=0)
+    groceries = db.Column(db.Float, nullable=False, default=0)
+    eating_out = db.Column(db.Float, nullable=False, default=0)
+    transportation = db.Column(db.Float, nullable=False, default=0)
+    entertainment = db.Column(db.Float, nullable=False, default=0)
+    savings = db.Column(db.Float, nullable=False, default=0)
+    phone_bill = db.Column(db.Float, nullable=False, default=0)
+    electricity = db.Column(db.Float, nullable=False, default=0)
+    wifi = db.Column(db.Float, nullable=False, default=0)
+    miscellaneous = db.Column(db.Float, nullable=False, default=0)
+    # Optional: thresholds if needed
+    #thresholds = db.Column(db.JSON, nullable=True)  # JSON column for thresholds
 
 
 # Chatroom table
@@ -31,16 +52,16 @@ class Chatroom(db.Model):
 
 
 # UserBudget table
-class UserBudget(db.Model):
-    __tablename__ = 'user_budget'  # Specifies the table name
+# class UserBudget(db.Model):
+#     __tablename__ = 'user_budget'  # Specifies the table name
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # Primary key
-    category = db.Column(db.String(255), nullable=False, index=True)  # Indexed for performance
-    amount = db.Column(db.Float, nullable=False)  # Amount cannot be null
+#     id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # Primary key
+#     category = db.Column(db.String(255), nullable=False, index=True)  # Indexed for performance
+#     amount = db.Column(db.Float, nullable=False)  # Amount cannot be null
 
-    # String representation of the UserBudget object for debugging
-    def __repr__(self):
-        return f'<UserBudget {self.category}: {self.amount}>'
+#     # String representation of the UserBudget object for debugging
+#     def __repr__(self):
+#         return f'<UserBudget {self.category}: {self.amount}>'
 
 
 # CategoryThreshold table

@@ -3,6 +3,9 @@ from flask import Flask
 from extensions import db, jwt, cors
 from gevent import monkey
 
+from routes import routes_blueprint, api
+from flask_jwt_extended import JWTManager
+from config import Config
 # Patch for gevent compatibility
 # monkey.patch_all()
 
@@ -17,6 +20,9 @@ except ImportError:
 
 def create_app():
     app = Flask(__name__)
+    app.config.from_object(Config)
+    app.config["JWT_ALGORITHM"] = "HS256"
+    app.config["SECRET_KEY"] = "your_secret_key_here"
 
     # If config.py is available, use it. Otherwise, rely on environment variables.
     if config_available:
@@ -40,6 +46,7 @@ def create_app():
     # Register blueprints for routing
     from routes import routes_blueprint
     app.register_blueprint(routes_blueprint)
+    app.register_blueprint(api, url_prefix='/api')
 
     # Create tables if they don't exist
     with app.app_context():

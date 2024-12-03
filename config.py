@@ -10,13 +10,16 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Secret key for encryption (sessions, JWTs, etc.)
-    SECRET_KEY = os.getenv('SECRET_KEY', secrets.token_hex(32))
+    SECRET_KEY = 'a-very-secure-hardcoded-secret-key'
 
     # Debug mode
-    DEBUG = os.getenv('FLASK_DEBUG', False)
+    DEBUG = True
+
+    
 
     # SQLAlchemy engine options to handle connection pooling
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_recycle': 28000,  # Recycles idle connections before timeout
         'pool_pre_ping': True   # Ensures connection validity before use
     }
+

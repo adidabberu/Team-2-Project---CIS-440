@@ -5,16 +5,17 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token
 from extensions import db  # Import db from the newly created extensions.py file
 from model import User  # Import the User model
-from transformers import AutoModelForCausalLM, AutoTokenizer
-import torch
+from model import UserBudget
+# from transformers import AutoModelForCausalLM, AutoTokenizer
+# import torch
 import pandas as pd
 
 routes_blueprint = Blueprint('routes', __name__)
 
 # Load the model and tokenizer globally for efficiency
-MODEL_NAME = "microsoft/DialoGPT-medium"
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-model = AutoModelForCausalLM.from_pretrained(MODEL_NAME)
+# MODEL_NAME = "microsoft/DialoGPT-medium"
+# tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+# model = AutoModelForCausalLM.from_pretrained(MODEL_NAME)
 
 
 THRESHOLDS = {
@@ -30,6 +31,123 @@ THRESHOLDS = {
     'WiFi': 0.05,
     'Miscellaneous': 0.05,
 }
+
+from flask_jwt_extended import jwt_required, get_jwt_identity
+api = Blueprint('api', __name__)
+
+from datetime import datetime
+from sqlalchemy.exc import SQLAlchemyError
+
+@api.route('/user_budgets', methods=['GET'])
+def get_user_budgets():
+    user_id = request.args.get('user_id')
+    if not user_id:
+        return jsonify({"error": "User ID is required"}), 400
+
+    try:
+        budgets = UserBudget.query.filter_by(user_id=user_id).order_by(UserBudget.month).all()
+        
+        # Format the response to return only necessary data
+        response = [
+            {
+                "id": budget.id,
+                "month": budget.month,
+                "category": category,
+                "amount": getattr(budget, category)
+            }
+            for budget in budgets
+            for category in [
+                "rent_mortgage", "car_insurance", "groceries", "eating_out",
+                "transportation", "entertainment", "savings", "phone_bill",
+                "electricity", "wifi", "miscellaneous"
+            ]
+            if getattr(budget, category, 0) > 0  # Include only non-zero values
+        ]
+
+        return jsonify(response), 200
+    except Exception as e:
+        print(f"Error fetching budgets: {e}")
+        return jsonify({"error": "Internal server error"}), 500
+
+@api.route('/budget_history', methods=['GET'])
+def get_budget_history():
+    user_id = request.args.get('user_id')
+    if not user_id:
+        return jsonify({"error": "User ID is required"}), 400
+
+    # Fetch budgets from the database
+    budgets = UserBudget.query.filter_by(user_id=user_id).order_by(UserBudget.month.desc()).all()
+
+    # Convert budgets to a list of dictionaries
+    history = [
+        {
+            "id": budget.id,
+            "month": budget.month,
+            "category": budget.category,
+            "amount": budget.amount,
+        }
+        for budget in budgets
+    ]
+
+    return jsonify(history), 200
+
+
+@api.route('/submit_budget', methods=['POST'])
+def submit_budget():
+    try:
+        data = request.json
+
+        # Validate payload
+        if not data or 'user_id' not in data or 'budgetData' not in data:
+            return jsonify({'error': 'User ID and budget data are required'}), 400
+
+        user_id = data['user_id']
+        budget_data = data['budgetData']
+
+        # Validate budget fields
+        if not isinstance(budget_data.get('month'), str):
+            return jsonify({"error": "'month' must be a string in YYYY-MM format"}), 400
+
+        try:
+            datetime.strptime(budget_data['month'], "%Y-%m")
+        except ValueError:
+            return jsonify({"error": "'month' must be in YYYY-MM format"}), 400
+
+        if not isinstance(budget_data.get('monthly_income'), (int, float)):
+            return jsonify({"error": "'monthly_income' must be a number"}), 400
+
+        expenses = budget_data.get('expenses')
+        if not isinstance(expenses, dict):
+            return jsonify({"error": "'expenses' must be an object with category-value pairs"}), 400
+
+        # Save each expense as a separate field
+        user_budget = UserBudget(
+            user_id=data['user_id'],  # Use the user_id from the payload
+            month=budget_data['month'],
+            monthly_income=budget_data['monthly_income'],
+            rent_mortgage=expenses.get("Rent/Mortgage", 0),
+            car_insurance=expenses.get("Car Insurance", 0),
+            groceries=expenses.get("Groceries", 0),
+            eating_out=expenses.get("Eating Out", 0),
+            transportation=expenses.get("Transportation", 0),
+            entertainment=expenses.get("Entertainment", 0),
+            savings=expenses.get("Savings", 0),
+            phone_bill=expenses.get("Phone Bill", 0),
+            electricity=expenses.get("Electricity", 0),
+            wifi=expenses.get("WiFi", 0),
+            miscellaneous=expenses.get("Miscellaneous", 0)
+        )
+
+
+        db.session.add(user_budget)
+        db.session.commit()
+
+        return jsonify({'message': 'Budget submitted successfully'}), 201
+    except Exception as e:
+        db.session.rollback()
+        print("Error:", str(e))  # Log the error for debugging
+        return jsonify({'error': 'Internal server error'}), 500
+
 
 @routes_blueprint.route('/analyze_budget', methods=['POST'])
 def analyze_budget():
@@ -135,12 +253,14 @@ def login():
         return jsonify({"error": "Invalid credentials"}), 400  # Return error if credentials are invalid
 
     # Generate a JWT token that expires in 1 hour
-    token = create_access_token(identity=user.email, expires_delta=datetime.timedelta(hours=1))
+    from datetime import timedelta
+    token = create_access_token(identity=user.email, expires_delta=timedelta(hours=1))
 
     # Return success message, token, and the user's admin status
     return jsonify({
         "message": "Login successful!", 
         "token": token,
+        "user_id": user.id,
         "admin": user.admin  # Include the admin property in the response
     }), 200
 
