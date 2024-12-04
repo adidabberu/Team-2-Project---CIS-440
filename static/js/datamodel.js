@@ -136,3 +136,4 @@ const DataModel = {
         }
     }
 };
+export default DataModel; 

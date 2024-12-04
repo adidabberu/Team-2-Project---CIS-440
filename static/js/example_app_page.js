@@ -1,12 +1,145 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const budgetForm = document.getElementById("budgetForm");
+import DataModel from './datamodel.js'; 
+// document.addEventListener('DOMContentLoaded', function() {
+//     const budgetForm = document.getElementById("budgetForm");
     
-    if (budgetForm) {
-        budgetForm.addEventListener("submit", (event) => {
-            event.preventDefault();
+//     if (budgetForm) {
+//         budgetForm.addEventListener("submit", (event) => {
+//             event.preventDefault();
             
+//             const monthInput = document.getElementById('budgetMonth').value;
+//             const monthDate = new Date(monthInput + "-01"); // Add day for proper date parsing
+//             const income = parseFloat(document.getElementById("monthlyIncome").value);
+//             const expenses = {
+//                 "Rent/Mortgage": parseFloat(document.getElementById("rentMortgage").value) || 0,
+//                 "Car Insurance": parseFloat(document.getElementById("carInsurance").value) || 0,
+//                 "Groceries": parseFloat(document.getElementById("groceries").value) || 0,
+//                 "Eating Out": parseFloat(document.getElementById("eatingOut").value) || 0,
+//                 "Transportation": parseFloat(document.getElementById("transportation").value) || 0,
+//                 "Entertainment": parseFloat(document.getElementById("entertainment").value) || 0,
+//                 "Savings": parseFloat(document.getElementById("savings").value) || 0,
+//                 "Phone Bill": parseFloat(document.getElementById("phoneBill").value) || 0,
+//                 "Electricity": parseFloat(document.getElementById("electricity").value) || 0,
+//                 "WiFi": parseFloat(document.getElementById("wifi").value) || 0,
+//                 "Miscellaneous": parseFloat(document.getElementById("miscellaneous").value) || 0,
+//             };
+
+//             const thresholds = {
+//                 "Rent/Mortgage": 0.30,
+//                 "Car Insurance": 0.10,
+//                 "Groceries": 0.15,
+//                 "Eating Out": 0.10,
+//                 "Transportation": 0.10,
+//                 "Entertainment": 0.10,
+//                 "Savings": 0.20,
+//                 "Phone Bill": 0.05,
+//                 "Electricity": 0.10,
+//                 "WiFi": 0.05,
+//                 "Miscellaneous": 0.05,
+//             };
+
+//             const budgetData = {
+//                 timestamp: new Date().toISOString(),
+//                 month: monthDate.toISOString(),
+//                 monthlyIncome: income,
+//                 expenses: expenses,
+//                 thresholds: thresholds
+//             };
+
+//             storeBudgetData(budgetData);
+
+//             const results = [];
+//             for (const [category, amount] of Object.entries(expenses)) {
+//                 const threshold = thresholds[category];
+//                 const ratio = amount / income;
+//                 const flag = ratio > threshold;
+//                 results.push({ category, amount, threshold, ratio, flag });
+//             }
+
+//             const resultsDiv = document.getElementById("results");
+//             resultsDiv.innerHTML = `<h3>Budget Analysis Results</h3>`;
+//             results.forEach(({ category, amount, threshold, ratio, flag }) => {
+//                 const statusClass = flag ? "over-budget" : "within-budget";
+//                 const statusText = flag ? "Over Budget" : "Within Budget";
+//                 resultsDiv.innerHTML += `
+//                     <div>
+//                         <strong>${category}:</strong> $${amount.toFixed(2)} 
+//                         (${(ratio * 100).toFixed(2)}% of income, threshold: ${(threshold * 100).toFixed(2)}%) 
+//                         - <span class="${statusClass}">${statusText}</span>
+//                     </div>`;
+//             });
+
+//             // Just close the modal and update dashboard
+//             const budgetModal = bootstrap.Modal.getInstance(document.getElementById('budgetModal'));
+//             budgetModal.hide();
+//         });
+
+// document.addEventListener('DOMContentLoaded', async () => {
+//     const userId = localStorage.getItem('userId'); // Retrieve user ID from localStorage
+//     if (!userId) {
+//         console.error("User ID not found.");
+//         alert("Please log in.");
+//         window.location.href = "/login"; // Redirect to login
+//         return;
+//     }
+
+//     try {
+//         // Fetch budget history for the user
+//         const response = await fetch(`/api/user_budgets?user_id=${userId}`);
+//         if (!response.ok) {
+//             throw new Error("Failed to fetch budget history.");
+//         }
+
+//         const budgets = await response.json();
+//         populateDropdown(budgets);
+//     } catch (error) {
+//         console.error("Error fetching budgets:", error);
+//         alert("Failed to load budget history.");
+//     }
+// });
+
+// Populate the dropdown menu with budget history
+function populateDropdown(budgets) {
+    const dropdown = document.getElementById("budgetSelector"); // Ensure the dropdown has this ID
+    if (!dropdown) {
+        console.error("Dropdown element not found.");
+        return;
+    }
+
+    dropdown.innerHTML = '<option value="">Select a budget entry...</option>'; // Default option
+
+    // Group budgets by month
+    const groupedBudgets = budgets.reduce((acc, budget) => {
+        acc[budget.month] = acc[budget.month] || [];
+        acc[budget.month].push(budget);
+        return acc;
+    }, {});
+
+    // Populate the dropdown
+    Object.keys(groupedBudgets).forEach((month) => {
+        const option = document.createElement("option");
+        option.value = month;
+        option.textContent = month; // e.g., "2024-12"
+        dropdown.appendChild(option);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const budgetForm = document.getElementById("budgetForm");
+
+    if (budgetForm) {
+        budgetForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            // Get user ID
+            const userId = localStorage.getItem("userId");
+            if (!userId) {
+                console.error("User ID is missing");
+                alert("User ID is missing. Please contact support.");
+                return;
+            }
+            // Get other inputs
             const monthInput = document.getElementById('budgetMonth').value;
-            const monthDate = new Date(monthInput + "-01"); // Add day for proper date parsing
+            const monthDate = new Date(monthInput + "-01"); // Add day for proper parsing
             const income = parseFloat(document.getElementById("monthlyIncome").value);
             const expenses = {
                 "Rent/Mortgage": parseFloat(document.getElementById("rentMortgage").value) || 0,
@@ -36,6 +169,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 "Miscellaneous": 0.05,
             };
 
+            const payload = {
+                user_id: userId, // Include the user ID
+                budgetData: {
+                    month: monthDate.toISOString().slice(0, 7), // Format as "YYYY-MM"
+                    monthly_income: income, // Correct field name
+                    expenses: expenses, // Ensure this is an object with numeric values
+                    thresholds: thresholds
+                }
+            };
             const budgetData = {
                 timestamp: new Date().toISOString(),
                 month: monthDate.toISOString(),
@@ -70,7 +212,36 @@ document.addEventListener('DOMContentLoaded', function() {
             // Just close the modal and update dashboard
             const budgetModal = bootstrap.Modal.getInstance(document.getElementById('budgetModal'));
             budgetModal.hide();
+            
+            console.log('Payload Sent:', JSON.stringify(payload));
+            
+            try {
+                const response = await fetch('/api/submit_budget', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                });
+            
+                if (!response.ok) {
+                    const error = await response.json();
+                    console.error('Server Response:', error);
+                    throw new Error(error.error || 'Unknown error occurred');
+                }
+            
+                const result = await response.json();
+                console.log('Budget submitted:', result);
+                // window.location.href = '/dashboard'; // Redirect to dashboard
+                // alert('Budget submitted successfully!');
+            } catch (error) {
+                console.error('Failed to submit budget:', error);
+                alert('Failed to submit budget. Please try again.');
+            }
+            
+            
         });
+
         
     }
 
