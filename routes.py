@@ -6,16 +6,16 @@ from flask_jwt_extended import create_access_token
 from extensions import db  # Import db from the newly created extensions.py file
 from model import User  # Import the User model
 from model import UserBudget
-# from transformers import AutoModelForCausalLM, AutoTokenizer
-# import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+import torch
 import pandas as pd
 
 routes_blueprint = Blueprint('routes', __name__)
 
 # Load the model and tokenizer globally for efficiency
-# MODEL_NAME = "microsoft/DialoGPT-medium"
-# tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-# model = AutoModelForCausalLM.from_pretrained(MODEL_NAME)
+MODEL_NAME = "microsoft/DialoGPT-medium"
+tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+model = AutoModelForCausalLM.from_pretrained(MODEL_NAME)
 
 
 THRESHOLDS = {
