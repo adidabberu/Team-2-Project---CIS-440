@@ -75,10 +75,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
         // Journal Entry Logic
-
+    const journalEntryIcon = document.getElementById("journalEntryIcon");
     const journalForm = document.getElementById('journalForm');
     const journalEntryField = document.getElementById('journalEntry');
     const journalNameField = document.getElementById('journalName'); // New input for entry name
+
+    // Open the journal modal when the journal entry icon is clicked
+    document.getElementById('journalEntryIcon').addEventListener('click', function() {
+        const journalModal = new bootstrap.Modal(document.getElementById('journalModal'));
+        journalModal.show();
+    });
 
     // Save the journal entry
     journalForm.addEventListener('submit', (event) => {
@@ -312,6 +318,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Check admin status
 
 });
+
+
 
 // Get elements
 const chatHead = document.getElementById('chatHead');

@@ -6,25 +6,32 @@
     <title>Budget Management Dashboard</title>
     <link rel="stylesheet" href="static/css/example_app_page.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,800" rel="stylesheet">
+   
 </head>
 <body>
     <div class="container-fluid">
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#">Budget Dashboard</a>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#budgetModal">
-                    Add New Budget
-                </button>
-                <select id="budgetSelector" class="form-select ms-2">
-                    <option value="">Select a budget entry...</option>
+        <nav class="navbar">
+            <div class="navbar-left">
+                <!-- <img src="static/css/wealth-health-logo.png" alt="Logo" class="logo"> -->
+                
+            </div>
+            <div class="navbar-brand">Wealth is Health.</div>
+            <div class="navbar-center">
+                <select id="budgetSelector" class="budget-selector">
+                    <option value="">Select a previous budget entry...</option>
                 </select>
             </div>
+           <button class="btn btn-primary" id="addBudgetButton" data-bs-toggle="modal" data-bs-target="#budgetModal">
+                <span class="plus-sign">+</span>
+                <span class="button-text">Add New Budget</span>
+            </button>
         </nav>
 
         <div class="row">
             <div class="col-md-6">
                 <div class="card mb-4">
-                    <div class="card-header">
+                    <div class="card-header custom-header">
                         Expense Distribution
                     </div>
                     <div class="card-body">
@@ -34,7 +41,7 @@
             </div>
             <div class="col-md-3">
                 <div class="card mb-4">
-                    <div class="card-header">
+                    <div class="card-header custom-header">
                         Monthly Summary
                     </div>
                     <div class="card-body">
@@ -42,7 +49,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <!-- <div class="col-md-3">
                 <div class="card mb-4">
                     <div class="card-body">
                         <button id="budgetingJournal" class="btn btn-secondary w-100" data-bs-toggle="modal" data-bs-target="#journalModal">
@@ -50,7 +57,7 @@
                         </button>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
 
         <!-- New Section to View Journal Entries -->
@@ -73,17 +80,17 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="card">
-                    <div class="card-header">
-                        Recent Transactions
-                    </div>
+                    <div class="card-header custom-header">
+                        Budget Analysis Result</div>
                     <div class="card-body">
                         <div id="transactions"></div>
+
                     </div>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header custom-header">
                         Savings Goal Progress
                     </div>
                     <div class="card-body">
@@ -233,7 +240,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="card">
-                <div class="card-header">
+                <div class="card-header custom-header">
                     Journal Entries
                 </div>
                 <div class="card-body">
@@ -246,14 +253,19 @@
     </div>
 </div>
 
+<div class="journal-entry-icon" id="journalEntryIcon">
+    📝
+</div>
+
 <div class="chat-head" id="chatHead">
     💬
+    <span class="button-text">Budget Boy</span>
 </div>
 
 <!-- Chat Modal -->
 <div class="chat-modal" id="chatModal">
     <div class="chat-modal-header">
-        AI Chat Assistant
+        Budget Boy
     </div>
     <div class="chat-modal-body" id="chatBody">
         <!-- Chat messages will appear here -->

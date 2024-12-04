@@ -1,50 +1,28 @@
-/* Place page specific styles */
-/* Be sure to link this to your app html page! */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
 body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
-}
-.budget-form {
-    max-width: 600px;
-    margin: 0 auto;
-}
-.form-control {
-    width: 100%;
-    padding: 8px;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-.btn-primary {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-.results {
-    margin-top: 20px;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: #f9f9f9;
-}
-.results div {
-    margin: 5px 0;
-}
-.over-budget {
-    color: red;
-}
-.within-budget {
-    color: green;
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 20px;
+    /* background-color: #c2ecc2; */
+    background: linear-gradient(to bottom, #e9eedddd 2.5%, #ffffff 47.5%, #ffffff 50%); /* Gradient from pink to orange */
+
+    color: #333;
 }
 
-.chat-head {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #007bff;
+
+#addBudgetButton {
+    padding: 12px 15px;
+    margin: 5px 0;
+    border-radius: 18px;
+    word-wrap: break-word;
+    line-height: 1.5;
+    font-size: 14px;
+    display: inline-block;
+    clear: both;
+
+    background-color: #369661c7;
     color: white;
     border-radius: 50%;
     width: 60px;
@@ -53,79 +31,304 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.plus-sign {
+    font-size: 24px;  /* Plus sign size */
+    transition: opacity 0.3s ease;  /* Smooth transition for plus sign */
+    text-align: center;
+}
+
+.button-text {
+    position: absolute;
+    opacity: 0;  /* Hidden text by default */
+    white-space: nowrap;
+    transition: opacity 0.3s ease;  /* Smooth transition for text */
+    font-size: 14px;
+    padding: 10px;
+    background-color: #333;
+    border-radius: 6px;
+    margin-left: 15px;  /* Move the text slightly to the right */
+    padding: 5px 10px;
+    z-index: 10;  /* Ensure text appears above other content */
+}
+
+#addBudgetButton:hover .plus-sign {
+    opacity: 0;  /* Hide the plus sign on hover */
+}
+
+#addBudgetButton:hover .button-text {
+    opacity: 1;  
+    transform: translateX(10px); 
+}
+
+
+.navbar-brand {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800; /* This will make it bold */
+    font-size: 70px !important;
+    color: #124559 !important;
+    display: flex;
+}
+
+.card-header {
+    font-family: 'Montserrat', sans-serif;
+    color: #124559 !important;
+}
+.custom-header {
+    background-color: #8da4766f !important;
+}
+
+/* .navbar {
+    background-color: white;
+    color: #36363F;
+    height: 75px;
+    padding: 15px;
+} */
+
+.navbar-left {
+    position: absolute !important;
+    top: 10px !important; 
+    left: 10px !important; 
+}
+
+.logo {
+    height: 60px; 
+    width: auto;
+}
+
+.btn btn-primary{
+    font-family: 'Montserrat', sans-serif;
+    font-size: 24px; 
+}
+
+.container-fluid {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.card {
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+
+.budget-form {
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
+.form-control {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #4a90e2;
+    outline: none;
+}
+
+.btn-primary {
+    background-color: #369661c7;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #21b053;
+}
+
+.results {
+    margin-top: 30px;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.results div {
+    margin: 10px 0;
+    font-size: 14px;
+}
+
+.over-budget {
+    color: #e74c3c;
+    font-weight: 600;
+}
+
+.within-budget {
+    color: #2ecc71;
+    font-weight: 600;
+}
+
+.journal-entry-icon {
+    position: fixed;
+    bottom: 120px;  /* Adjust the distance from the bottom as needed */
+    right: 30px;    /* Adjust the distance from the right as needed */
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1050;  /* Ensure it's above other elements */
+}
+
+
+.journal-entry-icon:hover .journal-icon-img {
+    transform: scale(1.1);  /* Slight zoom effect on hover */
+}
+
+/* Optional: To ensure smooth interaction with the chatbot */
+.chat-head {
+    bottom: 30px;
+}
+
+
+.card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.card-header {
+    background-color: #369661c7;
+    color: white;
+    padding: 15px 20px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    font-weight: 600;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.journal-entry-icon {
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    background-color: #369661c7;
+    color: white;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+    z-index: 1060;  /* Ensure it appears above the chatbot icon */
+}
+
+.journal-entry-icon:hover .journal-icon-img {
+    transform: scale(1.1);  /* Slight zoom effect when hovered */
+}
+
+.chat-head {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: #369661c7;
+    color: white;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.chat-head:hover {
+    transform: scale(1.1);
+}
+
 .chat-modal {
     position: fixed;
     bottom: 100px;
-    right: 20px;
-    width: 300px;
-    max-height: 400px;
+    right: 100px;
+    width: 350px;
+    max-height: 500px;
     background: white;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
     display: flex;
     flex-direction: column;
-    justify-content: flex-end; /* Align content at the bottom of the container */
 }
 
 .chat-modal-header {
-    background: #007bff;
+    background: #369661c7;
     color: white;
-    padding: 10px;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+    padding: 15px;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    font-weight: 600;
 }
+
 .chat-modal-body {
     flex: 1;
     overflow-y: auto;
-    padding: 10px;
+    padding: 15px;
     display: flex;
     flex-direction: column;
-    gap: 10px; /* Space between bubbles */
+    gap: 15px;
 }
+
 .chat-modal-footer {
     display: flex;
-    padding: 10px;
-    border-top: 1px solid #ddd;
+    padding: 15px;
+    border-top: 1px solid #e0e0e0;
 }
 
 .chat-modal-footer input {
     flex: 1;
-    padding: 5px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-right: 5px;
-    height: 35px;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    margin-right: 10px;
+    font-size: 14px;
 }
 
 .chat-bubble {
-    max-width: 75%; /* Control max width */
-    padding: 10px;
+    max-width: 80%;
+    padding: 12px 15px;
     margin: 5px 0;
-    border-radius: 15px;
+    border-radius: 18px;
     word-wrap: break-word;
     line-height: 1.5;
     font-size: 14px;
     display: inline-block;
-    clear: both; /* Ensures each bubble floats independently */
+    clear: both;
 }
 
 .chat-bubble.user {
-    background-color: #007bff;
+    background-color: #369661c7;
     color: white;
-    align-self: flex-end; /* User bubbles aligned to the right */
-    border-bottom-right-radius: 0;
-    text-align: right; /* Align text to the right */
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
 }
-
 
 .chat-bubble.ai {
-    background-color: #f1f1f1;
+    background-color: #f1f3f4;
     color: #333;
-    align-self: flex-start; /* AI bubbles aligned to the left */
-    border-bottom-left-radius: 0;
-    text-align: left; /* Align text to the left */
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
 }
-
