@@ -21,6 +21,8 @@ body {
     font-size: 14px;
     display: inline-block;
     clear: both;
+    right: 30px;
+    /* position: fixed; */
 
     background-color: #369661c7;
     color: white;
@@ -36,23 +38,23 @@ body {
 }
 
 .plus-sign {
-    font-size: 24px;  /* Plus sign size */
-    transition: opacity 0.3s ease;  /* Smooth transition for plus sign */
+    font-size: 24px; 
+    transition: opacity 0.3s ease;  
     text-align: center;
 }
 
 .button-text {
     position: absolute;
-    opacity: 0;  /* Hidden text by default */
+    opacity: 0; 
     white-space: nowrap;
-    transition: opacity 0.3s ease;  /* Smooth transition for text */
+    transition: opacity 0.3s ease; 
     font-size: 14px;
     padding: 10px;
     background-color: #333;
     border-radius: 6px;
-    margin-left: 15px;  /* Move the text slightly to the right */
+    margin-left: 15px;  
     padding: 5px 10px;
-    z-index: 10;  /* Ensure text appears above other content */
+    z-index: 10; 
 }
 
 #addBudgetButton:hover .plus-sign {
@@ -63,11 +65,47 @@ body {
     opacity: 1;  
     transform: translateX(10px); 
 }
+ 
+/* .navbar{
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+} */
 
+/* .navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+} */
+
+.budget-selector {
+    padding: 10px 10px;
+    font-size: 1rem;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    background-color: white;
+    display: flex;
+
+}
+.navbar-right{
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    padding: 8px 16px;
+    box-shadow: 0 4px 8px rgba(40, 41, 39, 0.1);
+    position: fixed;
+    right: 30px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 1000;
+}
 
 .navbar-brand {
     font-family: 'Montserrat', sans-serif;
-    font-weight: 800; /* This will make it bold */
+    font-weight: 800; 
     font-size: 70px !important;
     color: #124559 !important;
     display: flex;
@@ -80,13 +118,6 @@ body {
 .custom-header {
     background-color: #8da4766f !important;
 }
-
-/* .navbar {
-    background-color: white;
-    color: #36363F;
-    height: 75px;
-    padding: 15px;
-} */
 
 .navbar-left {
     position: absolute !important;
