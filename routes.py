@@ -9,6 +9,7 @@ from model import UserBudget
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 import pandas as pd
+from model import JournalEntry
 
 routes_blueprint = Blueprint('routes', __name__)
 
@@ -409,3 +410,48 @@ def chat():
 
     except Exception as e:
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+    
+
+@routes_blueprint.route('/add_journal_entry', methods=['POST'])
+@jwt_required()  # Ensure the user is logged in
+def add_journal_entry():
+    current_user = get_jwt_identity()  # Get the logged-in user from JWT token
+    
+    data = request.json
+    title = data.get('title')
+    content = data.get('content')
+
+    if not title or not content:
+        return jsonify({"error": "Title and content are required"}), 400
+
+    # Create a new journal entry for the logged-in user
+    new_entry = JournalEntry(
+        user_id=current_user,
+        title=title,
+        content=content
+    )
+
+    try:
+        db.session.add(new_entry)
+        db.session.commit()
+        return jsonify({"message": "Journal entry added successfully!"}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+    
+
+@routes_blueprint.route('/get_journal_entries', methods=['GET'])
+@jwt_required()  # Ensure the user is logged in
+def get_journal_entries():
+    current_user = get_jwt_identity()  # Get the logged-in user from JWT token
+
+    # Fetch journal entries specific to the logged-in user
+    entries = JournalEntry.query.filter_by(user_id=current_user).all()
+
+    # Format the response
+    entries_data = [
+        {"id": entry.id, "title": entry.title, "content": entry.content, "created_at": entry.created_at}
+        for entry in entries
+    ]
+    
+    return jsonify(entries_data), 200
