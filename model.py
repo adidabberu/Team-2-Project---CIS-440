@@ -5,7 +5,7 @@ class JournalEntry(db.Model):
     __tablename__ = 'journal_entries'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Link to User
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # Link to User
     user = db.relationship('User', backref=db.backref('journal_entries', lazy=True))  # Relationship to User
     title = db.Column(db.String(255), nullable=False)
     content = db.Column(db.Text, nullable=False)
