@@ -7,12 +7,12 @@
 //              handle the event that will be called by the listener.
 
 function displayRegister() {
-    var registerModal = new bootstrap.Modal(document.getElementById('createAccountModal'));
+    var registerModal = new bootstrap.Modal(document.getElementById('displayRegister'));
     registerModal.show();
 }
 
 // Wait until the DOM is fully loaded before attaching the event listener
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("displayRegister", function() {
     // Add the event listener to the form submit event
     document.getElementById("createAccountForm").addEventListener("submit", function(event) {
         event.preventDefault(); // Prevent the default form submission
