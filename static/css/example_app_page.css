@@ -6,7 +6,7 @@ body {
     margin: 0;
     padding: 20px;
     /* background-color: #c2ecc2; */
-    background: linear-gradient(to bottom, #e9eedddd 2.5%, #ffffff 47.5%, #ffffff 50%); /* Gradient from pink to orange */
+    background: linear-gradient(to bottom, #e9eedddd 2.5%, #ffffff 47.5%, #ffffff 50%); 
 
     color: #333;
 }

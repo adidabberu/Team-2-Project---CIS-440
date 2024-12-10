@@ -196,7 +196,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 results.push({ category, amount, threshold, ratio, flag });
             }
 
-            const resultsDiv = document.getElementById("results");
+            // const resultsDiv = document.getElementById("results");
+            const resultsDiv = document.getElementById("analysisResults");
             resultsDiv.innerHTML = `<h3>Budget Analysis Results</h3>`;
             results.forEach(({ category, amount, threshold, ratio, flag }) => {
                 const statusClass = flag ? "over-budget" : "within-budget";
@@ -256,6 +257,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const journalModal = new bootstrap.Modal(document.getElementById('journalModal'));
         journalModal.show();
     });
+
+
+    
 
     // Save the journal entry
     journalForm.addEventListener('submit', (event) => {
@@ -387,6 +391,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    
     const budgetSelector = document.getElementById('budgetSelector');
     if (budgetSelector) {
         budgetSelector.addEventListener('change', function() {
