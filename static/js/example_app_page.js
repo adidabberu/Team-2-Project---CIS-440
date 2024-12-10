@@ -76,7 +76,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // const resultsDiv = document.getElementById("results");
             const resultsDiv = document.getElementById("analysisResults");
-            resultsDiv.innerHTML = `<h3>Budget Analysis Results</h3>`;
+            // resultsDiv.innerHTML = `<h3>Budget Analysis Results</h3>`;
+            resultsDiv.innerHTML = ""; 
             results.forEach(({ category, amount, threshold, ratio, flag }) => {
                 const statusClass = flag ? "over-budget" : "within-budget";
                 const statusText = flag ? "Over Budget" : "Within Budget";
@@ -292,8 +293,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         results.push({ category, amount, threshold, ratio, flag });
                     }
     
-                    const resultsDiv = document.getElementById("results");
-                    resultsDiv.innerHTML = `<h3>Budget Analysis Results</h3>`;
+                    // const resultsDiv = document.getElementById("results");
+                    const resultsDiv = document.getElementById("analysisResults");
+                    // resultsDiv.innerHTML = `<h3>Budget Analysis Results</h3>`;
+                    resultsDiv.innerHTML = "";
                     results.forEach(({ category, amount, threshold, ratio, flag }) => {
                         const statusClass = flag ? "over-budget" : "within-budget";
                         const statusText = flag ? "Over Budget" : "Within Budget";
@@ -734,8 +737,10 @@ function runBudgetAnalysis(selectedBudget) {
         results.push({ category, amount, threshold, ratio, flag });
     }
 
-    const resultsDiv = document.getElementById("results");
-    resultsDiv.innerHTML = `<h3>Budget Analysis Results</h3>`;
+    // const resultsDiv = document.getElementById("results");
+    // resultsDiv.innerHTML = `<h3>Budget Analysis Results</h3>`;
+    const resultsDiv = document.getElementById("analysisResults");
+    resultsDiv.innerHTML = "";
     results.forEach(({ category, amount, threshold, ratio, flag }) => {
         const statusClass = flag ? "over-budget" : "within-budget";
         const statusText = flag ? "Over Budget" : "Within Budget";
@@ -792,6 +797,19 @@ function initializeBudgetsOnLogin() {
     } else {
         console.warn("No budget history available.");
     }
+    
+    const resultsDiv = document.getElementById("analysisResults");
+    resultsDiv.innerHTML = "";
+    results.forEach(({ category, amount, threshold, ratio, flag }) => {
+        const statusClass = flag ? "over-budget" : "within-budget";
+        const statusText = flag ? "Over Budget" : "Within Budget";
+        resultsDiv.innerHTML += `
+            <div>
+                <strong>${category}:</strong> $${amount.toFixed(2)} 
+                (${(ratio * 100).toFixed(2)}% of income, threshold: ${(threshold * 100).toFixed(2)}%) 
+                - <span class="${statusClass}">${statusText}</span>
+            </div>`;
+    });
 }
 
 
