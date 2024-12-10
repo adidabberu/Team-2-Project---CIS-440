@@ -1,127 +1,5 @@
 import DataModel from './datamodel.js'; 
-// document.addEventListener('DOMContentLoaded', function() {
-//     const budgetForm = document.getElementById("budgetForm");
-    
-//     if (budgetForm) {
-//         budgetForm.addEventListener("submit", (event) => {
-//             event.preventDefault();
-            
-//             const monthInput = document.getElementById('budgetMonth').value;
-//             const monthDate = new Date(monthInput + "-01"); // Add day for proper date parsing
-//             const income = parseFloat(document.getElementById("monthlyIncome").value);
-//             const expenses = {
-//                 "Rent/Mortgage": parseFloat(document.getElementById("rentMortgage").value) || 0,
-//                 "Car Insurance": parseFloat(document.getElementById("carInsurance").value) || 0,
-//                 "Groceries": parseFloat(document.getElementById("groceries").value) || 0,
-//                 "Eating Out": parseFloat(document.getElementById("eatingOut").value) || 0,
-//                 "Transportation": parseFloat(document.getElementById("transportation").value) || 0,
-//                 "Entertainment": parseFloat(document.getElementById("entertainment").value) || 0,
-//                 "Savings": parseFloat(document.getElementById("savings").value) || 0,
-//                 "Phone Bill": parseFloat(document.getElementById("phoneBill").value) || 0,
-//                 "Electricity": parseFloat(document.getElementById("electricity").value) || 0,
-//                 "WiFi": parseFloat(document.getElementById("wifi").value) || 0,
-//                 "Miscellaneous": parseFloat(document.getElementById("miscellaneous").value) || 0,
-//             };
 
-//             const thresholds = {
-//                 "Rent/Mortgage": 0.30,
-//                 "Car Insurance": 0.10,
-//                 "Groceries": 0.15,
-//                 "Eating Out": 0.10,
-//                 "Transportation": 0.10,
-//                 "Entertainment": 0.10,
-//                 "Savings": 0.20,
-//                 "Phone Bill": 0.05,
-//                 "Electricity": 0.10,
-//                 "WiFi": 0.05,
-//                 "Miscellaneous": 0.05,
-//             };
-
-//             const budgetData = {
-//                 timestamp: new Date().toISOString(),
-//                 month: monthDate.toISOString(),
-//                 monthlyIncome: income,
-//                 expenses: expenses,
-//                 thresholds: thresholds
-//             };
-
-//             storeBudgetData(budgetData);
-
-//             const results = [];
-//             for (const [category, amount] of Object.entries(expenses)) {
-//                 const threshold = thresholds[category];
-//                 const ratio = amount / income;
-//                 const flag = ratio > threshold;
-//                 results.push({ category, amount, threshold, ratio, flag });
-//             }
-
-//             const resultsDiv = document.getElementById("results");
-//             resultsDiv.innerHTML = `<h3>Budget Analysis Results</h3>`;
-//             results.forEach(({ category, amount, threshold, ratio, flag }) => {
-//                 const statusClass = flag ? "over-budget" : "within-budget";
-//                 const statusText = flag ? "Over Budget" : "Within Budget";
-//                 resultsDiv.innerHTML += `
-//                     <div>
-//                         <strong>${category}:</strong> $${amount.toFixed(2)} 
-//                         (${(ratio * 100).toFixed(2)}% of income, threshold: ${(threshold * 100).toFixed(2)}%) 
-//                         - <span class="${statusClass}">${statusText}</span>
-//                     </div>`;
-//             });
-
-//             // Just close the modal and update dashboard
-//             const budgetModal = bootstrap.Modal.getInstance(document.getElementById('budgetModal'));
-//             budgetModal.hide();
-//         });
-
-// document.addEventListener('DOMContentLoaded', async () => {
-//     const userId = localStorage.getItem('userId'); // Retrieve user ID from localStorage
-//     if (!userId) {
-//         console.error("User ID not found.");
-//         alert("Please log in.");
-//         window.location.href = "/login"; // Redirect to login
-//         return;
-//     }
-
-//     try {
-//         // Fetch budget history for the user
-//         const response = await fetch(`/api/user_budgets?user_id=${userId}`);
-//         if (!response.ok) {
-//             throw new Error("Failed to fetch budget history.");
-//         }
-
-//         const budgets = await response.json();
-//         populateDropdown(budgets);
-//     } catch (error) {
-//         console.error("Error fetching budgets:", error);
-//         alert("Failed to load budget history.");
-//     }
-// });
-
-// Populate the dropdown menu with budget history
-function populateDropdown(budgets) {
-    const dropdown = document.getElementById("budgetSelector"); // Ensure the dropdown has this ID
-    if (!dropdown) {
-        console.error("Dropdown element not found.");
-        return;
-    }
-
-    dropdown.innerHTML = '<option value="">Select a budget entry...</option>'; // Default option
-
-    // Group budgets by month
-    const groupedBudgets = budgets.reduce((acc, budget) => {
-        acc[budget.month] = acc[budget.month] || [];
-        acc[budget.month].push(budget);
-        return acc;
-    }, {});
-
-    // Populate the dropdown
-    Object.keys(groupedBudgets).forEach((month) => {
-        const option = document.createElement("option");
-        option.value = month;
-        option.textContent = month; // e.g., "2024-12"
-        dropdown.appendChild(option);
-    });
-}
 
 document.addEventListener('DOMContentLoaded', function () {
     const budgetForm = document.getElementById("budgetForm");
@@ -395,12 +273,16 @@ document.addEventListener('DOMContentLoaded', function () {
     const budgetSelector = document.getElementById('budgetSelector');
     if (budgetSelector) {
         budgetSelector.addEventListener('change', function() {
-            const selectedIndex = this.value;
-            if (selectedIndex !== "") {
+            const selectedIndex =  parseInt(this.value, 10); 
+            console.log("Selected index:", selectedIndex);
+            if (!isNaN(selectedIndex)) {
                 const budgetHistory = JSON.parse(localStorage.getItem('budgetHistory')) || [];
+                console.log("Budget history:", budgetHistory); 
                 const selectedBudget = budgetHistory[selectedIndex];
+                console.log("Selected budget:", selectedBudget);
                 if (selectedBudget) {
                     updateDashboard(selectedBudget);
+                    runBudgetAnalysis(selectedBudget);
                     // Analyze and display budget results
                     const results = [];
                     for (const [category, amount] of Object.entries(selectedBudget.expenses)) {
@@ -422,6 +304,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                 - <span class="${statusClass}">${statusText}</span>
                             </div>`;
                     });
+                } else {
+                    console.error("Selected budget not found!", error.message);
                 }
             }
         });
@@ -494,6 +378,28 @@ document.addEventListener('DOMContentLoaded', function () {
     // Check admin status
 
 });
+
+// function runBudgetAnalysis(selectedBudget) {
+//     const results = [];
+//     for (const [category, amount] of Object.entries(selectedBudget.expenses)) {
+//         const threshold = selectedBudget.thresholds[category];
+//         const ratio = amount / selectedBudget.monthlyIncome;
+//         const flag = ratio > threshold;
+//         results.push({ category, amount, threshold, ratio, flag });
+//     }
+
+//     const resultsDiv = document.getElementById("results");
+//     resultsDiv.innerHTML = `<h3>Budget Analysis Results</h3>`;
+//     results.forEach(({ category, amount, threshold, ratio, flag }) => {
+//         const statusClass = flag ? "over-budget" : "within-budget";
+//         const statusText = flag ? "Over Budget" : "Within Budget";
+//         resultsDiv.innerHTML += `
+//             <div>
+//                 <strong>${category}:</strong> $${amount.toFixed(2)} 
+//                 (${(ratio * 100).toFixed(2)}% of income, threshold: ${(threshold * 100).toFixed(2)}%) 
+//                 - <span class="${statusClass}">${statusText}</span>
+//             </div>`;
+//     });
 
 
 
@@ -707,31 +613,35 @@ function showEditModal(userId) {
 function updateBudgetSelector() {
     const selector = document.getElementById('budgetSelector');
     if (!selector) return;
-    
+
     const budgetHistory = JSON.parse(localStorage.getItem('budgetHistory')) || [];
-    
+    console.log("Budget history:", budgetHistory); // Debug log
+
     // Clear existing options
     selector.innerHTML = '<option value="">Select a budget entry...</option>';
-    
-    // Add unique entries only
-    const uniqueEntries = new Map();
+
+    // Add budgets to the dropdown
     budgetHistory.forEach((entry, index) => {
         const date = new Date(entry.month);
-        const monthYear = date.toLocaleString('en-US', { 
-            year: 'numeric', 
-            month: 'long' 
-        });
-        uniqueEntries.set(monthYear, { entry, index });
-    });
-    
-    // Create options from unique entries
-    uniqueEntries.forEach(({entry, index}, monthYear) => {
+        const monthYear = date.toLocaleString('en-US', { year: 'numeric', month: 'long' });
+
         const option = document.createElement('option');
-        option.value = index;
-        option.textContent = monthYear;
+        option.value = index; // Use the index as the value
+        option.textContent = monthYear; // Display "Month Year"
         selector.appendChild(option);
     });
 }
+
+
+    
+    // Create options from unique entries
+    // uniqueEntries.forEach(({entry, index}, monthYear) => {
+    //     const option = document.createElement('option');
+    //     option.value = index;
+    //     option.textContent = monthYear;
+    //     selector.appendChild(option);
+    // });
+
 
 function updateMonthlySummary(budgetData) {
     const summaryDiv = document.getElementById('monthlySummary');
@@ -792,15 +702,159 @@ function updateExpenseChart(budgetData) {
 }
 
 function updateDashboard(budgetData) {
+    console.log("Updating dashboard with:", budgetData); // Log budget data
+    if (!budgetData) {
+        console.error("Invalid budget data:", budgetData);
+        return;
+    }
+
+    // Verify `month` format
+    if (!/^\d{4}-\d{2}$/.test(budgetData.month)) {
+        console.error("Invalid month format:", budgetData.month);
+        budgetData.month = new Date(budgetData.month).toISOString().slice(0, 7); // Fix format
+        console.log("Fixed month format:", budgetData.month);
+    }
+
     updateExpenseChart(budgetData);
     updateMonthlySummary(budgetData);
     updateSavingsProgress(budgetData);
 }
 
-function storeBudgetData(budgetData) {
-    const budgetHistory = JSON.parse(localStorage.getItem('budgetHistory')) || [];
-    budgetHistory.push(budgetData);
+function runBudgetAnalysis(selectedBudget) {
+    if (!selectedBudget || !selectedBudget.expenses || !selectedBudget.thresholds) {
+        console.error("Invalid budget data for analysis:", selectedBudget);
+        return;
+    }
+
+    const results = [];
+    for (const [category, amount] of Object.entries(selectedBudget.expenses)) {
+        const threshold = selectedBudget.thresholds[category];
+        const ratio = amount / selectedBudget.monthlyIncome;
+        const flag = ratio > threshold;
+        results.push({ category, amount, threshold, ratio, flag });
+    }
+
+    const resultsDiv = document.getElementById("results");
+    resultsDiv.innerHTML = `<h3>Budget Analysis Results</h3>`;
+    results.forEach(({ category, amount, threshold, ratio, flag }) => {
+        const statusClass = flag ? "over-budget" : "within-budget";
+        const statusText = flag ? "Over Budget" : "Within Budget";
+        resultsDiv.innerHTML += `
+            <div>
+                <strong>${category}:</strong> $${amount.toFixed(2)} 
+                (${(ratio * 100).toFixed(2)}% of income, threshold: ${(threshold * 100).toFixed(2)}%) 
+                - <span class="${statusClass}">${statusText}</span>
+            </div>`;
+    });
+}
+
+
+
+// function storeBudgetData(budgetData) {
+//     const budgetHistory = JSON.parse(localStorage.getItem('budgetHistory')) || [];
+//     budgetHistory.push(budgetData);
+//     localStorage.setItem('budgetHistory', JSON.stringify(budgetHistory));
+//     updateBudgetSelector();
+//     updateDashboard(budgetData);
+// }
+// function storeBudgetData(budgetData) {
+//     const budgetHistory = JSON.parse(localStorage.getItem('budgetHistory')) || [];
+//     budgetHistory.push(budgetData);
+//     localStorage.setItem('budgetHistory', JSON.stringify(budgetHistory));
+//     updateBudgetSelector();
+//     updateDashboard(budgetData);
+// }
+
+function initializeBudgetsOnLogin() {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+        alert("Please log in.");
+        window.location.href = "/login";
+        return;
+    }
+
+    let budgetHistory = JSON.parse(localStorage.getItem('budgetHistory')) || [];
+
+    // Normalize all `month` values to YYYY-MM
+    budgetHistory = budgetHistory.map(budget => ({
+        ...budget,
+        month: new Date(budget.month).toISOString().slice(0, 7), // Format as YYYY-MM
+    }));
+
+    // Save the normalized history back to localStorage
     localStorage.setItem('budgetHistory', JSON.stringify(budgetHistory));
+
+    // Populate dropdown and update dashboard
     updateBudgetSelector();
-    updateDashboard(budgetData);
+    if (budgetHistory.length > 0) {
+        const mostRecentBudget = budgetHistory[budgetHistory.length - 1];
+        updateDashboard(mostRecentBudget);
+    } else {
+        console.warn("No budget history available.");
+    }
+}
+
+
+// Call this function when the user logs in
+document.addEventListener('DOMContentLoaded', () => {
+    initializeBudgetsOnLogin();
+});
+
+function storeBudgetData(newBudget) {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+        alert("User is not logged in.");
+        return;
+    }
+
+    let budgetHistory = JSON.parse(localStorage.getItem('budgetHistory')) || [];
+
+    // Normalize `month` to YYYY-MM
+    newBudget.month = new Date(newBudget.month).toISOString().slice(0, 7); // Format as YYYY-MM
+
+    // Add the new budget to the history
+    budgetHistory.push(newBudget);
+
+    // Save back to localStorage
+    localStorage.setItem('budgetHistory', JSON.stringify(budgetHistory));
+
+    // Update dropdown and dashboard
+    updateBudgetSelector();
+    updateDashboard(newBudget);
+}
+
+// Populate the dropdown menu with budget history
+function populateDropdown(budgets) {
+    const dropdown = document.getElementById("budgetSelector"); // Ensure the dropdown has this ID
+    if (!dropdown) {
+        console.error("Dropdown element not found.");
+        return;
+    }
+
+    // Ensure budgets is a valid array
+    if (!Array.isArray(budgets)) {
+        console.error("Invalid budgets data. Expected an array.");
+        return;
+    }
+
+    dropdown.innerHTML = '<option value="">Select a budget entry...</option>'; // Default option
+
+    // Group budgets by "Month Year" format
+    const groupedBudgets = budgets.reduce((acc, budget) => {
+        // Format the `month` field as "Month Year"
+        const date = new Date(budget.month);
+        const formattedMonth = date.toLocaleString('default', { month: 'long', year: 'numeric' }); // e.g., "July 2024"
+        acc[formattedMonth] = acc[formattedMonth] || [];
+        acc[formattedMonth].push(budget);
+        return acc;
+    }, {});
+
+    // Populate the dropdown
+    Object.keys(groupedBudgets).forEach((formattedMonth) => {
+        const option = document.createElement("option");
+        option.value = formattedMonth; // Use formattedMonth as the value
+        option.textContent = formattedMonth; // Display "Month Year" in the dropdown
+        dropdown.appendChild(option);
+    });
+
 }
